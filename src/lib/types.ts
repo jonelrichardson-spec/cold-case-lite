@@ -32,3 +32,23 @@ export interface Case {
   file_date: string | null;
   msa: string | null;
 }
+
+export type CaseForCluster = Pick<Case, "county_fips" | "solved" | "state">;
+
+export interface Filters {
+  state: string | null;
+  vicSex: "Female" | "Male" | null;
+  weapon: string | null;
+  vicRace: string | null;
+  solveStatus: SolvedStatus | null;
+}
+
+export interface Cluster {
+  countyFips: string;
+  state: string;
+  total: number;
+  unsolved: number;
+  solveRate: number;
+  center: [number, number];
+  isFallback: boolean;
+}

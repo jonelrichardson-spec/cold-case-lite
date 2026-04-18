@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bg: #0c0c0e;
+  --color-bg2: #111216;
+  --color-bg3: #16181d;
+  --color-border: #1f2430;
+  --color-red: #c8102e;
+  --color-red-glow: rgba(200, 16, 46, 0.25);
+  --color-red-dim: rgba(200, 16, 46, 0.12);
+  --color-amber: #e8a020;
+  --color-amber-dim: rgba(232, 160, 32, 0.12);
+  --color-ice: #f0f2f5;
+  --color-muted: #5a6070;
+  --color-muted2: #8a929f;
+  --color-green: #22c55e;
+
+  --animate-fadeup: fadeup 0.8s ease-out both;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fadeup {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+.bg-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(12, 10, 10, 0) 0%,
+    rgba(12, 10, 10, 0) 35%,
+    rgba(12, 10, 10, 0.45) 60%,
+    rgba(12, 10, 10, 0.8) 78%,
+    rgba(12, 10, 10, 0.95) 92%
+  );
+}
+
+.bg-center-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(180, 20, 30, 0.22) 0%,
+    rgba(140, 12, 20, 0.14) 40%,
+    rgba(80, 8, 12, 0.06) 65%,
+    transparent 80%
+  );
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ice);
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
 }
