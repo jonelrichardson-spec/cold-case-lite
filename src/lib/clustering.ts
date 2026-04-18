@@ -1,5 +1,10 @@
-import { CLUSTER_UNSOLVED_THRESHOLD } from "@/lib/constants";
-import type { CaseForCluster, Cluster } from "@/lib/types";
+import { CLUSTER_UNSOLVED_THRESHOLD, STATE_MARKER } from "@/lib/constants";
+import type {
+  CaseForCluster,
+  Cluster,
+  NationalStateAggregate,
+  StateMarker,
+} from "@/lib/types";
 
 interface CountyAggregate {
   state: string;
@@ -46,6 +51,43 @@ export function computeClusters(
       solveRate,
       center,
       isFallback: !countyCenter,
+    });
+  }
+  return out;
+}
+
+// National path: one bubble per state, sized by sqrt(total) so AREA is
+// proportional to case volume (standard bubble-map convention — keeps the
+// smallest states legible when the largest is 300x bigger).
+export function buildNationalStateMarkers(
+  aggregates: NationalStateAggregate[],
+  stateCentroids: Record<string, [number, number]>,
+): StateMarker[] {
+  const withCenter = aggregates.filter((a) => stateCentroids[a.state]);
+  if (withCenter.length === 0) return [];
+
+  const sqrtTotals = withCenter.map((a) => Math.sqrt(a.total));
+  const minSqrt = Math.min(...sqrtTotals);
+  const maxSqrt = Math.max(...sqrtTotals);
+  const sqrtRange = maxSqrt - minSqrt || 1;
+  const { minPx, maxPx, redSolveRateThreshold } = STATE_MARKER;
+  const pxRange = maxPx - minPx;
+
+  const out: StateMarker[] = [];
+  for (const agg of withCenter) {
+    const t = (Math.sqrt(agg.total) - minSqrt) / sqrtRange;
+    const sizePx = Math.round(minPx + t * pxRange);
+    const tone: "red" | "amber" =
+      agg.solve_rate <= redSolveRateThreshold ? "red" : "amber";
+    out.push({
+      state: agg.state,
+      total: agg.total,
+      unsolved: agg.unsolved,
+      solveRate: agg.solve_rate,
+      clusterCount: agg.cluster_count,
+      center: stateCentroids[agg.state],
+      sizePx,
+      tone,
     });
   }
   return out;

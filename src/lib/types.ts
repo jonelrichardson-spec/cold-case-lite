@@ -57,3 +57,29 @@ export interface Cluster {
   center: [number, number];
   isFallback: boolean;
 }
+
+export interface NationalStateAggregate {
+  state: string;
+  total: number;
+  unsolved: number;
+  solve_rate: number;
+  cluster_count: number;
+}
+
+export interface NationalStatesFile {
+  total_cases: number;
+  total_unsolved: number;
+  total_clusters: number;
+  states: NationalStateAggregate[];
+}
+
+export interface StateMarker {
+  state: string;
+  total: number;
+  unsolved: number;
+  solveRate: number;
+  clusterCount: number;
+  center: [number, number];
+  sizePx: number;
+  tone: "red" | "amber";
+}

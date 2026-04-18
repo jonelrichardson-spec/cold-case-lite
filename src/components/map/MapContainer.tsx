@@ -10,9 +10,29 @@ import {
   loadStatesGeoJSON,
   type StatesCollection,
 } from "@/lib/geo";
-import type { Cluster } from "@/lib/types";
+import type { Cluster, StateMarker } from "@/lib/types";
 import { useFilterStore } from "@/stores/useFilterStore";
 import { useMapStore } from "@/stores/useMapStore";
+
+const COMPACT_INT = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+const STATE_MARKER_COLORS = {
+  red: {
+    fill: "rgba(200, 16, 46, 0.28)",
+    ring: "rgba(200, 16, 46, 0.55)",
+    text: "#FF4D6A",
+    glow: "0 0 24px rgba(200, 16, 46, 0.25)",
+  },
+  amber: {
+    fill: "rgba(232, 160, 32, 0.22)",
+    ring: "rgba(232, 160, 32, 0.55)",
+    text: "#F2B84A",
+    glow: "0 0 24px rgba(232, 160, 32, 0.20)",
+  },
+} as const;
 
 const STATE_SOURCE_ID = "us-states";
 const STATE_FILL_LAYER = "us-states-fill";
@@ -26,6 +46,7 @@ export default function MapContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const stateMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const statesRef = useRef<StatesCollection | null>(null);
   const styleLoadedRef = useRef(false);
 
@@ -112,6 +133,8 @@ export default function MapContainer() {
     return () => {
       for (const marker of markersRef.current) marker.remove();
       markersRef.current = [];
+      for (const marker of stateMarkersRef.current) marker.remove();
+      stateMarkersRef.current = [];
       map.remove();
       mapRef.current = null;
       statesRef.current = null;
@@ -162,6 +185,21 @@ export default function MapContainer() {
     }
   }, [clusters]);
 
+  const stateMarkers = useMapStore((s) => s.stateMarkers);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    for (const marker of stateMarkersRef.current) marker.remove();
+    stateMarkersRef.current = [];
+    for (const sm of stateMarkers) {
+      const element = createStateMarker(sm, handleStateMarkerClick);
+      const marker = new mapboxgl.Marker({ element })
+        .setLngLat(sm.center)
+        .addTo(map);
+      stateMarkersRef.current.push(marker);
+    }
+  }, [stateMarkers]);
+
   const hasDetailOpen = useMapStore((s) => s.selectedCluster !== null);
   useEffect(() => {
     const map = mapRef.current;
@@ -199,6 +237,52 @@ export default function MapContainer() {
 
 function handleClusterClick(cluster: Cluster): void {
   useMapStore.getState().selectCluster(cluster);
+}
+
+function handleStateMarkerClick(marker: StateMarker): void {
+  useFilterStore.getState().setState(marker.state);
+}
+
+function createStateMarker(
+  sm: StateMarker,
+  onClick: (marker: StateMarker) => void,
+): HTMLElement {
+  const palette = STATE_MARKER_COLORS[sm.tone];
+
+  const wrapper = document.createElement("button");
+  wrapper.type = "button";
+  wrapper.setAttribute(
+    "aria-label",
+    `${sm.state}: ${sm.total.toLocaleString("en-US")} cases, ${sm.clusterCount} clusters. Drill into state.`,
+  );
+  wrapper.title = `${sm.state} \u2014 ${sm.total.toLocaleString("en-US")} cases \u00b7 ${sm.clusterCount} clusters`;
+  wrapper.style.width = `${sm.sizePx}px`;
+  wrapper.style.height = `${sm.sizePx}px`;
+  wrapper.style.padding = "0";
+  wrapper.style.borderRadius = "50%";
+  wrapper.style.background = palette.fill;
+  wrapper.style.border = `1px solid ${palette.ring}`;
+  wrapper.style.boxShadow = palette.glow;
+  wrapper.style.display = "flex";
+  wrapper.style.alignItems = "center";
+  wrapper.style.justifyContent = "center";
+  wrapper.style.cursor = "pointer";
+  wrapper.addEventListener("click", (event) => {
+    event.stopPropagation();
+    onClick(sm);
+  });
+
+  const label = document.createElement("span");
+  label.textContent = COMPACT_INT.format(sm.total);
+  label.style.color = palette.text;
+  label.style.fontFamily = "var(--font-mono), monospace";
+  label.style.fontSize = `${Math.max(10, Math.round(sm.sizePx * 0.22))}px`;
+  label.style.fontWeight = "600";
+  label.style.letterSpacing = "0.5px";
+  label.style.pointerEvents = "none";
+  wrapper.appendChild(label);
+
+  return wrapper;
 }
 
 function createClusterMarker(
