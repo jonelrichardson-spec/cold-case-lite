@@ -256,3 +256,96 @@ export const RELIABILITY_TIER_LABELS: Record<ReliabilityTier, string> = {
   medium: "MEDIUM",
   high: "HIGH",
 };
+
+export const LOADER_DATA_QUALITY = {
+  unmatchedOriCount: 252,
+  unmatchedOriPct: 0.04,
+  rhodeIslandTypoCount: 1211,
+} as const;
+
+export const METHODOLOGY_COPY = {
+  eyebrow: "METHODOLOGY",
+  headline: "HOW IT WORKS",
+  maxWidthPx: 900,
+} as const;
+
+export type MethodologyCondition = {
+  label: string;
+  expression: string;
+};
+
+export const METHODOLOGY_ALGORITHM = {
+  label: "ALGORITHM",
+  title: "CLUSTER DETECTION",
+  intro:
+    "Cases are grouped by county FIPS code, weapon type, and victim demographic profile. A geographic cluster is flagged when the group meets both conditions:",
+  conditions: [
+    {
+      label: "Condition 1:",
+      expression: "total_cases >= min_cluster_size",
+    },
+    {
+      label: "Condition 2:",
+      expression: `unsolved_rate >= ${CLUSTER_UNSOLVED_THRESHOLD.toFixed(2)}`,
+    },
+  ] satisfies readonly MethodologyCondition[],
+  notes: `The minimum cluster size is user-adjustable (default ${MIN_CLUSTER_SIZE.default}, range ${MIN_CLUSTER_SIZE.min}-${MIN_CLUSTER_SIZE.max}, step ${MIN_CLUSTER_SIZE.step}). Unsolved rate is defined as the proportion of cases where the offender sex is not known (OFFSEX = 'U'). Clusters are ranked by unsolved case count descending.`,
+} as const;
+
+export type DataSource = {
+  name: string;
+  records: string;
+  years: string;
+  role: string;
+};
+
+export const METHODOLOGY_DATA_SOURCES = {
+  label: "DATA SOURCES",
+  title: "WHERE THE DATA COMES FROM",
+  sources: [
+    {
+      name: "SHR65_23.csv",
+      records: "894,636",
+      years: "1976-2023",
+      role: "Primary case-level dataset. Single source of truth for all cluster analysis.",
+    },
+    {
+      name: "UCR65_23a.sav",
+      records: "180,298",
+      years: "1965-2023",
+      role: "Agency-level clearance rates. ORI to county FIPS mapping.",
+    },
+    {
+      name: "State_Reporting_Rates_2022.xlsx",
+      records: "51",
+      years: "2022",
+      role: "Data confidence badges. Flags low-reporting states.",
+    },
+    {
+      name: "expanded-homicide-2024.zip",
+      records: "Aggregate",
+      years: "2020-2024",
+      role: "National trend line context. Not case-level data.",
+    },
+  ] satisfies readonly DataSource[],
+} as const;
+
+const LOW_CONFIDENCE_STATES_LIST = (() => {
+  const entries = Object.entries(LOW_REPORTING_STATES).map(
+    ([state, pct]) => `${state} (${pct}%)`,
+  );
+  if (entries.length <= 1) return entries.join("");
+  if (entries.length === 2) return entries.join(" and ");
+  return `${entries.slice(0, -1).join(", ")}, and ${entries[entries.length - 1]}`;
+})();
+
+export const METHODOLOGY_LIMITATIONS = {
+  label: "LIMITATIONS",
+  title: "KNOWN LIMITATIONS",
+  bullets: [
+    `Low-confidence states: ${LOW_CONFIDENCE_STATES_LIST} have chronically low reporting rates. Clusters in these states may undercount the true number of cases.`,
+    `${LOADER_DATA_QUALITY.unmatchedOriCount} unmatched ORI codes (${LOADER_DATA_QUALITY.unmatchedOriPct}% of cases) could not be mapped to a county FIPS code. These cases are included in national totals but excluded from geographic clustering.`,
+    `Rhode Island data: ${LOADER_DATA_QUALITY.rhodeIslandTypoCount.toLocaleString("en-US")} records were originally recorded as 'Rhodes Island' in the source data. These have been corrected in the loader.`,
+    "Solve rate definition: A case is considered solved when the offender sex field contains a known value. Cases where offender information is unknown or unreported are classified as unsolved.",
+  ] satisfies readonly string[],
+} as const;

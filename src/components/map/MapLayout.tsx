@@ -27,8 +27,12 @@ export function MapLayout({ filterPanel, mapSection }: MapLayoutProps) {
     ? "grid-cols-[260px_1fr_340px]"
     : "grid-cols-[260px_1fr]";
 
+  // NOTE: padding-top (not margin-top) here is load-bearing. Body has no BFC
+  // trigger, so a margin-top on this root would collapse through body and push
+  // the document scroll root down by 64px, creating a page-level scrollbar on
+  // /map. Padding lives inside this div and can't collapse.
   return (
-    <div className="mt-16 h-[calc(100vh-64px)] overflow-hidden">
+    <div className="h-screen overflow-hidden pt-16">
       <div className={`grid h-full min-h-0 grid-rows-1 ${gridColsClass}`}>
         {filterPanel}
         <section className="relative h-full min-h-0 overflow-hidden">
