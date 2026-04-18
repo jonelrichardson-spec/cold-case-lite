@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 
 const COLS = 16;
 const ROWS = 12;
-const CELL_PX = 58;
 
 interface Cell {
   key: string;
