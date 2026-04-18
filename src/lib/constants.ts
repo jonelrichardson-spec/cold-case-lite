@@ -31,3 +31,28 @@ export const REPORTING_CONFIDENCE_THRESHOLDS = {
 export const CASES_TABLE = "cases";
 
 export const SUPABASE_PAGE_SIZE = 1000;
+
+export const ROUTES = {
+  landing: "/",
+  map: "/map",
+  insights: "/insights",
+  methodology: "/methodology",
+} as const;
+
+export const LANDING_COPY = {
+  eyebrow: "INTELLIGENCE PLATFORM",
+  headline: {
+    lead: "COLD CASE",
+    accent: "NETWORK.",
+  },
+  subtext: {
+    line1: "What the data sees. What detectives missed.",
+    line2: "The map they never made.",
+  },
+  stat: {
+    value: "237,000+",
+    label: "UNSOLVED HOMICIDES SINCE 1980",
+  },
+  enterLabel: "ENTER",
+  enterAriaLabel: "Enter Cold Case Network map",
+} as const;
