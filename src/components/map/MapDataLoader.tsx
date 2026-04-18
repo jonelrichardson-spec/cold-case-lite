@@ -27,10 +27,12 @@ export function MapDataLoader() {
   const setLoading = useMapStore((s) => s.setLoading);
   const setData = useMapStore((s) => s.setData);
   const setError = useMapStore((s) => s.setError);
+  const clearCluster = useMapStore((s) => s.clearCluster);
 
   useEffect(() => {
     let cancelled = false;
     const filters: Filters = { state, vicSex, weapon, vicRace, solveStatus };
+    clearCluster();
 
     async function run() {
       setLoading(true);
@@ -95,6 +97,7 @@ export function MapDataLoader() {
     setLoading,
     setData,
     setError,
+    clearCluster,
   ]);
 
   return null;

@@ -65,3 +65,28 @@ body {
 body {
   font-family: var(--font-body), sans-serif;
 }
+
+html.no-scroll,
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}

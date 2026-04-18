@@ -154,13 +154,23 @@ export default function MapContainer() {
     for (const marker of markersRef.current) marker.remove();
     markersRef.current = [];
     for (const cluster of clusters) {
-      const element = createClusterMarker(cluster);
+      const element = createClusterMarker(cluster, handleClusterClick);
       const marker = new mapboxgl.Marker({ element })
         .setLngLat(cluster.center)
         .addTo(map);
       markersRef.current.push(marker);
     }
   }, [clusters]);
+
+  const hasDetailOpen = useMapStore((s) => s.selectedCluster !== null);
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const raf = requestAnimationFrame(() => {
+      if (mapRef.current) mapRef.current.resize();
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [hasDetailOpen]);
 
   const resetSignal = useMapStore((s) => s.resetSignal);
   const isFirstResetRef = useRef(true);
@@ -187,19 +197,27 @@ export default function MapContainer() {
   );
 }
 
-function createClusterMarker(cluster: Cluster): HTMLElement {
+function handleClusterClick(cluster: Cluster): void {
+  useMapStore.getState().selectCluster(cluster);
+}
+
+function createClusterMarker(
+  cluster: Cluster,
+  onClick: (cluster: Cluster) => void,
+): HTMLElement {
   const outer = clampSize(30 + (cluster.total - 5) * 0.15, 30, 68);
   const inner = Math.round(outer * 0.55);
 
-  const wrapper = document.createElement("div");
-  wrapper.setAttribute("role", "img");
+  const wrapper = document.createElement("button");
+  wrapper.type = "button";
   wrapper.setAttribute(
     "aria-label",
-    `${cluster.countyFips}: ${cluster.total} cases, ${cluster.unsolved} unsolved`,
+    `${cluster.countyFips}: ${cluster.total} cases, ${cluster.unsolved} unsolved. Open detail panel.`,
   );
   wrapper.title = `${cluster.countyFips} — ${cluster.total} cases · ${cluster.unsolved} unsolved`;
   wrapper.style.width = `${outer}px`;
   wrapper.style.height = `${outer}px`;
+  wrapper.style.padding = "0";
   wrapper.style.borderRadius = "50%";
   wrapper.style.background = "rgba(200, 16, 46, 0.12)";
   wrapper.style.border = "1px solid rgba(200, 16, 46, 0.35)";
@@ -208,6 +226,10 @@ function createClusterMarker(cluster: Cluster): HTMLElement {
   wrapper.style.alignItems = "center";
   wrapper.style.justifyContent = "center";
   wrapper.style.cursor = "pointer";
+  wrapper.addEventListener("click", (event) => {
+    event.stopPropagation();
+    onClick(cluster);
+  });
 
   const core = document.createElement("div");
   core.style.width = `${inner}px`;
@@ -215,6 +237,7 @@ function createClusterMarker(cluster: Cluster): HTMLElement {
   core.style.borderRadius = "50%";
   core.style.background = "rgba(200, 16, 46, 0.65)";
   core.style.border = "1px solid #C8102E";
+  core.style.pointerEvents = "none";
   wrapper.appendChild(core);
 
   return wrapper;

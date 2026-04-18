@@ -1,5 +1,6 @@
 import { FilterPanel } from "@/components/map/FilterPanel";
 import { MapDataLoader } from "@/components/map/MapDataLoader";
+import { MapLayout } from "@/components/map/MapLayout";
 import { MapShell } from "@/components/map/MapShell";
 import { ResetViewButton } from "@/components/map/ResetViewButton";
 import { StatsBar } from "@/components/map/StatsBar";
@@ -10,16 +11,16 @@ export default function MapPage() {
     <>
       <TopNav />
       <MapDataLoader />
-      <div className="h-screen pt-16">
-        <div className="grid h-full grid-cols-[260px_1fr]">
-          <FilterPanel />
-          <section className="relative h-full">
+      <MapLayout
+        filterPanel={<FilterPanel />}
+        mapSection={
+          <>
             <MapShell />
             <StatsBar />
             <ResetViewButton />
-          </section>
-        </div>
-      </div>
+          </>
+        }
+      />
     </>
   );
 }

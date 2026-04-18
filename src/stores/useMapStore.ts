@@ -20,6 +20,7 @@ export interface MapStoreData {
   isCapped: boolean;
   error: string | null;
   resetSignal: number;
+  selectedCluster: Cluster | null;
 }
 
 interface MapStoreActions {
@@ -27,6 +28,8 @@ interface MapStoreActions {
   setData: (patch: Partial<MapStoreData>) => void;
   setError: (msg: string | null) => void;
   triggerReset: () => void;
+  selectCluster: (cluster: Cluster) => void;
+  clearCluster: () => void;
 }
 
 export type MapStore = MapStoreData & MapStoreActions;
@@ -39,6 +42,7 @@ const INITIAL: MapStoreData = {
   isCapped: false,
   error: null,
   resetSignal: 0,
+  selectedCluster: null,
 };
 
 export const useMapStore = create<MapStore>((set) => ({
@@ -46,5 +50,11 @@ export const useMapStore = create<MapStore>((set) => ({
   setLoading: (isLoading) => set({ isLoading }),
   setData: (patch) => set(patch),
   setError: (error) => set({ error }),
-  triggerReset: () => set((s) => ({ resetSignal: s.resetSignal + 1 })),
+  triggerReset: () =>
+    set((s) => ({
+      resetSignal: s.resetSignal + 1,
+      selectedCluster: null,
+    })),
+  selectCluster: (cluster) => set({ selectedCluster: cluster }),
+  clearCluster: () => set({ selectedCluster: null }),
 }));

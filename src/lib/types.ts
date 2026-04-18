@@ -35,6 +35,11 @@ export interface Case {
 
 export type CaseForCluster = Pick<Case, "county_fips" | "solved" | "state">;
 
+export type CaseDetail = Pick<
+  Case,
+  "id" | "year" | "vic_age" | "vic_sex" | "vic_race" | "weapon" | "solved" | "agency"
+>;
+
 export interface Filters {
   state: string | null;
   vicSex: "Female" | "Male" | null;

@@ -5,7 +5,7 @@ import {
   REPORTING_RATES_TABLE,
   SUPABASE_PAGE_SIZE,
 } from "@/lib/constants";
-import type { CaseForCluster, Filters } from "@/lib/types";
+import type { CaseDetail, CaseForCluster, Filters } from "@/lib/types";
 
 function baseCountQuery(filters: Filters, forceSolved?: "Yes" | "No") {
   let q = supabase.from(CASES_TABLE).select("*", { count: "exact", head: true });
@@ -64,6 +64,43 @@ export async function fetchFilteredCases(
     if (error) throw error;
     if (!data || data.length === 0) break;
     rows.push(...(data as CaseForCluster[]));
+    if (data.length < limit) break;
+    offset += data.length;
+    if (offset >= CASES_FETCH_CAP) {
+      capped = true;
+      break;
+    }
+  }
+  return { rows, capped };
+}
+
+const CLUSTER_DETAIL_COLUMNS =
+  "id, year, vic_age, vic_sex, vic_race, weapon, solved, agency";
+
+export async function fetchClusterCases(
+  filters: Filters,
+  countyFips: string,
+): Promise<{ rows: CaseDetail[]; capped: boolean }> {
+  const rows: CaseDetail[] = [];
+  let offset = 0;
+  let capped = false;
+  while (offset < CASES_FETCH_CAP) {
+    const limit = Math.min(SUPABASE_PAGE_SIZE, CASES_FETCH_CAP - offset);
+    let q = supabase
+      .from(CASES_TABLE)
+      .select(CLUSTER_DETAIL_COLUMNS)
+      .eq("county_fips", countyFips)
+      .order("year", { ascending: false })
+      .range(offset, offset + limit - 1);
+    if (filters.state) q = q.eq("state", filters.state);
+    if (filters.vicSex) q = q.eq("vic_sex", filters.vicSex);
+    if (filters.weapon) q = q.eq("weapon", filters.weapon);
+    if (filters.vicRace) q = q.eq("vic_race", filters.vicRace);
+    if (filters.solveStatus) q = q.eq("solved", filters.solveStatus);
+    const { data, error } = await q;
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    rows.push(...(data as CaseDetail[]));
     if (data.length < limit) break;
     offset += data.length;
     if (offset >= CASES_FETCH_CAP) {
