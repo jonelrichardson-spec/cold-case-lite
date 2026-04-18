@@ -140,14 +140,14 @@ Each phase is not complete until:
 ### Phases for This Project
 | Phase | Goal | Status |
 |-------|------|--------|
-| 0 | Data prep: filter CSV to 1980-2000, set up Supabase, load data, verify Green River query | [ ] |
-| 1 | Scaffold: Next.js project, Tailwind, Zustand, Supabase client, env vars, file structure | [ ] |
-| 2 | Landing page: dark splash, headline, ENTER button, transition to map | [ ] |
-| 3 | Map view: Mapbox dark basemap, cluster markers from Supabase, live counter | [ ] |
-| 4 | Filter panel: State, Victim Sex, Weapon, Solve Status. Filters update map + counter | [ ] |
-| 5 | Detail panel: click cluster → right slide-out with Investigative Case File layout | [ ] |
-| 6 | Insights page: state reporting rates visualization, low-confidence badges | [ ] |
-| 7 | Navigation: persistent top nav (Map, Insights, Methodology), smooth transitions | [ ] |
+| 0 | Data prep: filter CSV to 1980-2000, set up Supabase, load data, verify Green River query | [x] |
+| 1 | Scaffold: Next.js project, Tailwind, Zustand, Supabase client, env vars, file structure | [x] |
+| 2 | Landing page: dark splash, headline, ENTER button, transition to map | [x] |
+| 3 | Map view: Mapbox dark basemap, cluster markers from Supabase, live counter | [x] |
+| 4 | Filter panel: State, Victim Sex, Weapon, Solve Status. Filters update map + counter | [x] |
+| 5 | Detail panel: click cluster → right slide-out with Investigative Case File layout | [x] |
+| 6 | Insights page: state reporting rates visualization, low-confidence badges | [x] |
+| 7 | Methodology page: algorithm formula, data sources, limitations | [ ] |
 | 8 | Deploy to Vercel, set env vars, verify both demos work on production URL | [ ] |
 
 ## 9. Read Before Write

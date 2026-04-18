@@ -172,3 +172,87 @@ export const LANDING_COPY = {
   enterLabel: "ENTER",
   enterAriaLabel: "Enter Cold Case Network map",
 } as const;
+
+export const INSIGHTS_COPY = {
+  eyebrow: "DATA INSIGHTS",
+  headline: "WHAT THE DATA SEES",
+  maxWidthPx: 1100,
+} as const;
+
+export const INSIGHTS_FINDING_LABELS = {
+  racial: {
+    number: "FINDING 01",
+    title: "RACIAL SOLVE RATE GAP",
+    legendBlack: "Black Victims",
+    legendWhite: "White Victims",
+  },
+  jurisdictional: {
+    number: "FINDING 02",
+    title: "JURISDICTIONAL ACCOUNTABILITY",
+  },
+  trend: {
+    number: "FINDING 03",
+    title: "NATIONAL TREND",
+    peakLabel: "2022 PEAK",
+    latestLabel: "2024 LATEST",
+  },
+  reliability: {
+    number: "FINDING 04",
+    title: "DATA RELIABILITY BY STATE",
+  },
+} as const;
+
+export type RacialSolveRateRow = {
+  decade: string;
+  blackPct: number;
+  whitePct: number;
+  gapPp: number;
+};
+
+export const RACIAL_SOLVE_RATE_DATA: readonly RacialSolveRateRow[] = [
+  { decade: "1980s", blackPct: 73.0, whitePct: 73.3, gapPp: 0.3 },
+  { decade: "1990s", blackPct: 64.9, whitePct: 72.3, gapPp: 7.4 },
+  { decade: "2000s", blackPct: 62.7, whitePct: 75.2, gapPp: 12.5 },
+  { decade: "2010s", blackPct: 61.4, whitePct: 79.1, gapPp: 17.8 },
+] as const;
+
+export type JurisdictionalRow = {
+  location: string;
+  solveRatePct: number;
+  caseCount: number;
+};
+
+export const JURISDICTIONAL_DATA: readonly JurisdictionalRow[] = [
+  { location: "Washington, DC", solveRatePct: 34.2, caseCount: 7108 },
+  { location: "San Mateo, CA", solveRatePct: 32.9, caseCount: 283 },
+  { location: "Los Angeles, CA", solveRatePct: 38.3, caseCount: 1113 },
+] as const;
+
+export const NATIONAL_TREND_DATA = {
+  peak: { year: 2022, value: 20306 },
+  latest: { year: 2024, value: 15795 },
+  declinePct: 22,
+  maxBarHeightPx: 120,
+} as const;
+
+export type ReliabilityTier = "low" | "medium" | "high";
+
+export type ReliabilityCell = {
+  stateCode: string;
+  reportingPct: number;
+  tier: ReliabilityTier;
+};
+
+export const DATA_RELIABILITY_DATA: readonly ReliabilityCell[] = [
+  { stateCode: "MS", reportingPct: 24, tier: "low" },
+  { stateCode: "FL", reportingPct: 48, tier: "low" },
+  { stateCode: "IA", reportingPct: 59, tier: "medium" },
+  { stateCode: "WA", reportingPct: 92, tier: "high" },
+  { stateCode: "VA", reportingPct: 100, tier: "high" },
+] as const;
+
+export const RELIABILITY_TIER_LABELS: Record<ReliabilityTier, string> = {
+  low: "LOW",
+  medium: "MEDIUM",
+  high: "HIGH",
+};

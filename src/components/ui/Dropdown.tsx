@@ -33,7 +33,6 @@ export function Dropdown<T>(props: DropdownProps<T>) {
   } = props;
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const listboxId = useId();
@@ -44,6 +43,23 @@ export function Dropdown<T>(props: DropdownProps<T>) {
           o.label.toLowerCase().includes(search.trim().toLowerCase()),
         )
       : [...options];
+
+  const [activeIndex, setActiveIndex] = useState(() => {
+    const i = options.findIndex((o) => Object.is(o.value, value));
+    return i >= 0 ? i : 0;
+  });
+  const [prevValue, setPrevValue] = useState<T>(value);
+  const [prevFilteredLength, setPrevFilteredLength] = useState(filtered.length);
+
+  // Adjust state during render (React 19 pattern) instead of an effect — keeps
+  // the active cursor aligned with the current value/filter without triggering
+  // a cascading re-render.
+  if (!Object.is(prevValue, value) || prevFilteredLength !== filtered.length) {
+    setPrevValue(value);
+    setPrevFilteredLength(filtered.length);
+    const i = filtered.findIndex((o) => Object.is(o.value, value));
+    setActiveIndex(i >= 0 ? i : 0);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -64,12 +80,6 @@ export function Dropdown<T>(props: DropdownProps<T>) {
       searchRef.current.focus();
     }
   }, [open, searchable]);
-
-  useEffect(() => {
-    const i = filtered.findIndex((o) => Object.is(o.value, value));
-    setActiveIndex(i >= 0 ? i : 0);
-    // filtered changes when search does; keep cursor within bounds
-  }, [filtered.length, value]);
 
   function selectIndex(index: number) {
     if (index < 0 || index >= filtered.length) return;
