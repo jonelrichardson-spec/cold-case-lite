@@ -57,7 +57,7 @@ export function FilterPanel() {
           RESET ALL
         </button>
       </header>
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
         <Dropdown
           label="State / Region"
           value={state}
@@ -98,15 +98,19 @@ export function FilterPanel() {
           onChange={setMinClusterSize}
         />
       </div>
-      <footer className="border-t border-border px-4 py-3">
+      <footer className="mt-auto flex shrink-0 items-center gap-2 overflow-hidden border-t border-border px-3 py-2">
         <span
-          className={`font-mono text-[10px] uppercase tracking-[2px] ${
+          aria-hidden="true"
+          className={`h-[6px] w-[6px] shrink-0 rounded-full ${
+            isAdequate ? "bg-green" : "bg-amber"
+          }`}
+        />
+        <span
+          className={`truncate font-mono text-[9px] uppercase tracking-[1.5px] ${
             isAdequate ? "text-green" : "text-amber"
           }`}
         >
-          {isAdequate
-            ? "\u2713 ADEQUATE REPORTING COVERAGE"
-            : "\u26A0 LOW REPORTING COVERAGE"}
+          {isAdequate ? "ADEQUATE REPORTING COVERAGE" : "LOW REPORTING COVERAGE"}
           {hasStateSelection && reporting.rate !== null
             ? ` \u2014 ${Math.round(reporting.rate)}%`
             : ""}
