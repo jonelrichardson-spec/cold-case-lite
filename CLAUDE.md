@@ -147,7 +147,7 @@ Each phase is not complete until:
 | 4 | Filter panel: State, Victim Sex, Weapon, Solve Status. Filters update map + counter | [x] |
 | 5 | Detail panel: click cluster → right slide-out with Investigative Case File layout | [x] |
 | 6 | Insights page: state reporting rates visualization, low-confidence badges | [x] |
-| 7 | Methodology page: algorithm formula, data sources, limitations | [ ] |
+| 7 | Methodology page: algorithm formula, data sources, limitations | [x] |
 | 8 | Deploy to Vercel, set env vars, verify both demos work on production URL | [ ] |
 
 ## 9. Read Before Write
