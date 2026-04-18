@@ -12,7 +12,7 @@ export const GREEN_RIVER_FILTER = {
 export const MAP_DEFAULT_VIEW = {
   longitude: -98.5795,
   latitude: 39.8283,
-  zoom: 3.8,
+  zoom: 3.5,
 } as const;
 
 export const MAPBOX_STYLE = "mapbox://styles/mapbox/dark-v11";
@@ -38,6 +38,14 @@ export const ROUTES = {
   insights: "/insights",
   methodology: "/methodology",
 } as const;
+
+export const NAV_ITEMS = [
+  { label: "Map", href: ROUTES.map },
+  { label: "Insights", href: ROUTES.insights },
+  { label: "Methodology", href: ROUTES.methodology },
+] as const;
+
+export const TOP_NAV_HEIGHT_PX = 64;
 
 export const LANDING_COPY = {
   eyebrow: "INTELLIGENCE PLATFORM",
