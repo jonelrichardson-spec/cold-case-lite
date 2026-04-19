@@ -148,8 +148,7 @@ Each phase is not complete until:
 | 5 | Detail panel: click cluster → right slide-out with Investigative Case File layout | [x] |
 | 6 | Insights page: state reporting rates visualization, low-confidence badges | [x] |
 | 7 | Methodology page: algorithm formula, data sources, limitations | [x] |
-| 8 | National/state view: default state bubbles; county markers render for all counties with data (red = cluster threshold met, amber = below threshold) | [x] |
-| 9 | Deploy to Vercel, set env vars, verify both demos work on production URL | [ ] |
+| 8 | Deploy to Vercel: env vars set, main pushed, production builds green, all four routes (/, /map, /insights, /methodology) verified. Pre-deploy work folded in: default state-bubble view, county marker tone coding, marker font/visibility hardening for prod | [x] |
 
 ## 9. Read Before Write
 
