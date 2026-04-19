@@ -100,4 +100,4 @@ Built as a capstone project for the Pursuit AI-Native Builder Fellowship (Septem
 
 ---
 
-Built by [Jonel Richardson](https://linkedin.com/in/jonel-richardson-09a399382)
+Built by [Jonel Richardson](https://linkedin.com/in/jonel-richardson)
