@@ -19,33 +19,42 @@ const COMPACT_INT = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 
+// Hardcoded font stack for mapbox marker DOM elements. Using var(--font-mono)
+// here was fragile in Tailwind v4 + Next.js prod builds: the @theme inline
+// block re-emits `--font-mono: var(--font-mono)` in the theme layer, and in
+// some cascade orders the inline style fails to resolve the actual IBM Plex
+// Mono stack. Hardcoding sidesteps the variable lookup entirely — the font is
+// still loaded by next/font, we just reference it by its real family name.
+const MARKER_FONT =
+  '"IBM Plex Mono", "IBM Plex Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace';
+
 const STATE_MARKER_COLORS = {
   red: {
-    fill: "rgba(200, 16, 46, 0.28)",
-    ring: "rgba(200, 16, 46, 0.55)",
-    text: "#FF4D6A",
-    glow: "0 0 24px rgba(200, 16, 46, 0.25)",
+    fill: "rgba(200, 16, 46, 0.42)",
+    ring: "rgba(200, 16, 46, 0.85)",
+    text: "#FFD9DF",
+    glow: "0 0 24px rgba(200, 16, 46, 0.35)",
   },
   amber: {
-    fill: "rgba(232, 160, 32, 0.22)",
-    ring: "rgba(232, 160, 32, 0.55)",
-    text: "#F2B84A",
-    glow: "0 0 24px rgba(232, 160, 32, 0.20)",
+    fill: "rgba(232, 160, 32, 0.38)",
+    ring: "rgba(232, 160, 32, 0.85)",
+    text: "#FFF3D6",
+    glow: "0 0 24px rgba(232, 160, 32, 0.30)",
   },
 } as const;
 
 const COUNTY_MARKER_COLORS = {
   red: {
-    fill: "rgba(200, 16, 46, 0.18)",
-    ring: "rgba(200, 16, 46, 0.65)",
-    text: "#FF4D6A",
-    glow: "0 0 24px rgba(200, 16, 46, 0.28)",
+    fill: "rgba(200, 16, 46, 0.42)",
+    ring: "rgba(200, 16, 46, 0.90)",
+    text: "#FFD9DF",
+    glow: "0 0 24px rgba(200, 16, 46, 0.40)",
   },
   amber: {
-    fill: "rgba(232, 160, 32, 0.16)",
-    ring: "rgba(232, 160, 32, 0.55)",
-    text: "#F2B84A",
-    glow: "0 0 22px rgba(232, 160, 32, 0.20)",
+    fill: "rgba(232, 160, 32, 0.34)",
+    ring: "rgba(232, 160, 32, 0.80)",
+    text: "#FFF3D6",
+    glow: "0 0 22px rgba(232, 160, 32, 0.28)",
   },
 } as const;
 
@@ -290,10 +299,11 @@ function createStateMarker(
   const label = document.createElement("span");
   label.textContent = COMPACT_INT.format(sm.total);
   label.style.color = palette.text;
-  label.style.fontFamily = "var(--font-mono), monospace";
-  label.style.fontSize = `${Math.max(10, Math.round(sm.sizePx * 0.22))}px`;
-  label.style.fontWeight = "600";
+  label.style.fontFamily = MARKER_FONT;
+  label.style.fontSize = `${Math.max(11, Math.round(sm.sizePx * 0.24))}px`;
+  label.style.fontWeight = "700";
   label.style.letterSpacing = "0.5px";
+  label.style.textShadow = "0 1px 2px rgba(0, 0, 0, 0.65)";
   label.style.pointerEvents = "none";
   wrapper.appendChild(label);
 
@@ -334,10 +344,11 @@ function createClusterMarker(
   const label = document.createElement("span");
   label.textContent = COMPACT_INT.format(cluster.total);
   label.style.color = palette.text;
-  label.style.fontFamily = "var(--font-mono), monospace";
-  label.style.fontSize = `${Math.max(10, Math.round(outer * 0.28))}px`;
-  label.style.fontWeight = "600";
+  label.style.fontFamily = MARKER_FONT;
+  label.style.fontSize = `${Math.max(11, Math.round(outer * 0.30))}px`;
+  label.style.fontWeight = "700";
   label.style.letterSpacing = "0.5px";
+  label.style.textShadow = "0 1px 2px rgba(0, 0, 0, 0.65)";
   label.style.pointerEvents = "none";
   wrapper.appendChild(label);
 
