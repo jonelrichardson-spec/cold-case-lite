@@ -44,3 +44,7 @@ claude-local.md
 
 # claude code local settings
 .claude/settings.local.json
+
+# data loader scripts (contain hardcoded Supabase credentials — run locally only)
+load_data.py
+build_national_clusters.py
