@@ -2,7 +2,7 @@
 
 > A geographic intelligence tool that surfaces unsolved homicide clusters from FBI data, built for investigative journalists, true crime producers, and cold case units.
 
-![Cold Case Network Map View](screenshot.png)
+![Cold Case Network Map View](docs/screenshot.png)
 
 **Live:** [cold-case-lite.vercel.app](https://cold-case-lite.vercel.app)
 
