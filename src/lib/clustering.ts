@@ -1,5 +1,10 @@
-import { CLUSTER_UNSOLVED_THRESHOLD } from "@/lib/constants";
-import type { CaseForCluster, Cluster } from "@/lib/types";
+import { CLUSTER_UNSOLVED_THRESHOLD, STATE_MARKER } from "@/lib/constants";
+import type {
+  CaseForCluster,
+  Cluster,
+  NationalStateAggregate,
+  StateMarker,
+} from "@/lib/types";
 
 interface CountyAggregate {
   state: string;
@@ -31,13 +36,14 @@ export function computeClusters(
 
   const out: Cluster[] = [];
   for (const [countyFips, agg] of groups) {
-    if (agg.total < minClusterSize) continue;
-    const unsolvedRatio = agg.unsolved / agg.total;
-    if (unsolvedRatio < CLUSTER_UNSOLVED_THRESHOLD) continue;
-    const solveRate = 1 - unsolvedRatio;
     const countyCenter = countyCentroids[countyFips];
     const center = countyCenter ?? stateCentroids[agg.state];
     if (!center) continue;
+    const unsolvedRatio = agg.total > 0 ? agg.unsolved / agg.total : 0;
+    const solveRate = 1 - unsolvedRatio;
+    const meetsThreshold =
+      agg.total >= minClusterSize &&
+      unsolvedRatio >= CLUSTER_UNSOLVED_THRESHOLD;
     out.push({
       countyFips,
       state: agg.state,
@@ -46,6 +52,44 @@ export function computeClusters(
       solveRate,
       center,
       isFallback: !countyCenter,
+      tone: meetsThreshold ? "red" : "amber",
+    });
+  }
+  return out;
+}
+
+// National path: one bubble per state, sized by sqrt(total) so AREA is
+// proportional to case volume (standard bubble-map convention — keeps the
+// smallest states legible when the largest is 300x bigger).
+export function buildNationalStateMarkers(
+  aggregates: NationalStateAggregate[],
+  stateCentroids: Record<string, [number, number]>,
+): StateMarker[] {
+  const withCenter = aggregates.filter((a) => stateCentroids[a.state]);
+  if (withCenter.length === 0) return [];
+
+  const sqrtTotals = withCenter.map((a) => Math.sqrt(a.total));
+  const minSqrt = Math.min(...sqrtTotals);
+  const maxSqrt = Math.max(...sqrtTotals);
+  const sqrtRange = maxSqrt - minSqrt || 1;
+  const { minPx, maxPx, redSolveRateThreshold } = STATE_MARKER;
+  const pxRange = maxPx - minPx;
+
+  const out: StateMarker[] = [];
+  for (const agg of withCenter) {
+    const t = (Math.sqrt(agg.total) - minSqrt) / sqrtRange;
+    const sizePx = Math.round(minPx + t * pxRange);
+    const tone: "red" | "amber" =
+      agg.solve_rate <= redSolveRateThreshold ? "red" : "amber";
+    out.push({
+      state: agg.state,
+      total: agg.total,
+      unsolved: agg.unsolved,
+      solveRate: agg.solve_rate,
+      clusterCount: agg.cluster_count,
+      center: stateCentroids[agg.state],
+      sizePx,
+      tone,
     });
   }
   return out;

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Cluster } from "@/lib/types";
+import type { Cluster, StateMarker } from "@/lib/types";
 
 export interface MapStats {
   cases: number;
@@ -15,6 +15,7 @@ export interface ReportingBadge {
 export interface MapStoreData {
   stats: MapStats;
   clusters: Cluster[];
+  stateMarkers: StateMarker[];
   reporting: ReportingBadge;
   isLoading: boolean;
   isCapped: boolean;
@@ -37,6 +38,7 @@ export type MapStore = MapStoreData & MapStoreActions;
 const INITIAL: MapStoreData = {
   stats: { cases: 0, unsolved: 0, clusters: 0 },
   clusters: [],
+  stateMarkers: [],
   reporting: { state: null, rate: null },
   isLoading: false,
   isCapped: false,

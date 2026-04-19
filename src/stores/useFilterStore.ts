@@ -35,3 +35,16 @@ export const useFilterStore = create<FilterStore>((set) => ({
   setMinClusterSize: (minClusterSize) => set({ minClusterSize }),
   reset: () => set(INITIAL),
 }));
+
+// True when any data filter differs from its default. minClusterSize is a
+// display stepper, not a data filter, so it is intentionally excluded —
+// adjusting it should not pull the map out of the static-national path.
+export function hasActiveFilters(filters: Filters): boolean {
+  return (
+    filters.state !== null ||
+    filters.vicSex !== null ||
+    filters.weapon !== null ||
+    filters.vicRace !== null ||
+    filters.solveStatus !== null
+  );
+}

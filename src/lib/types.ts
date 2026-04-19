@@ -56,4 +56,34 @@ export interface Cluster {
   solveRate: number;
   center: [number, number];
   isFallback: boolean;
+  // "red" = county meets the cluster threshold (total >= minClusterSize AND
+  // unsolvedRatio >= CLUSTER_UNSOLVED_THRESHOLD). "amber" = below threshold but
+  // still rendered so users see the full distribution as they add filters.
+  tone: "red" | "amber";
+}
+
+export interface NationalStateAggregate {
+  state: string;
+  total: number;
+  unsolved: number;
+  solve_rate: number;
+  cluster_count: number;
+}
+
+export interface NationalStatesFile {
+  total_cases: number;
+  total_unsolved: number;
+  total_clusters: number;
+  states: NationalStateAggregate[];
+}
+
+export interface StateMarker {
+  state: string;
+  total: number;
+  unsolved: number;
+  solveRate: number;
+  clusterCount: number;
+  center: [number, number];
+  sizePx: number;
+  tone: "red" | "amber";
 }

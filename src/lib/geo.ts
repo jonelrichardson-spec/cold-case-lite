@@ -4,7 +4,12 @@ import type {
   MultiPolygon,
   Polygon,
 } from "geojson";
-import { CENTROID_DATA_PATH, STATES_GEOJSON_PATH } from "@/lib/constants";
+import {
+  CENTROID_DATA_PATH,
+  NATIONAL_CLUSTERS_PATH,
+  STATES_GEOJSON_PATH,
+} from "@/lib/constants";
+import type { NationalStatesFile } from "@/lib/types";
 
 export type CountyCentroids = Record<string, [number, number]>;
 export interface StateProps {
@@ -18,6 +23,7 @@ export type StatesCollection = FeatureCollection<
 
 let centroidsCache: CountyCentroids | null = null;
 let statesCache: StatesCollection | null = null;
+let nationalStatesCache: NationalStatesFile | null = null;
 
 export async function loadCountyCentroids(): Promise<CountyCentroids> {
   if (centroidsCache) return centroidsCache;
@@ -38,6 +44,20 @@ export async function loadStatesGeoJSON(): Promise<StatesCollection> {
   }
   const data = (await res.json()) as StatesCollection;
   statesCache = data;
+  return data;
+}
+
+export async function loadNationalStates(): Promise<NationalStatesFile> {
+  if (nationalStatesCache) return nationalStatesCache;
+  const res = await fetch(NATIONAL_CLUSTERS_PATH);
+  if (!res.ok) {
+    throw new Error(`Failed to load national states: ${res.status}`);
+  }
+  const data = (await res.json()) as NationalStatesFile;
+  if (!data || !Array.isArray(data.states)) {
+    throw new Error("National states file is malformed");
+  }
+  nationalStatesCache = data;
   return data;
 }
 

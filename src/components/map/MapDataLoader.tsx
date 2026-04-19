@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { computeClusters } from "@/lib/clustering";
+import { buildNationalStateMarkers, computeClusters } from "@/lib/clustering";
 import {
   buildStateCentroidMap,
   loadCountyCentroids,
+  loadNationalStates,
   loadStatesGeoJSON,
 } from "@/lib/geo";
 import {
@@ -13,7 +14,7 @@ import {
   fetchStats,
 } from "@/lib/queries";
 import type { Filters } from "@/lib/types";
-import { useFilterStore } from "@/stores/useFilterStore";
+import { hasActiveFilters, useFilterStore } from "@/stores/useFilterStore";
 import { useMapStore } from "@/stores/useMapStore";
 
 export function MapDataLoader() {
@@ -32,45 +33,70 @@ export function MapDataLoader() {
   useEffect(() => {
     let cancelled = false;
     const filters: Filters = { state, vicSex, weapon, vicRace, solveStatus };
+    const filtersActive = hasActiveFilters(filters);
     clearCluster();
 
     async function run() {
       setLoading(true);
       setError(null);
       try {
-        const [stats, centroids, geo, reportingRate] = await Promise.all([
-          fetchStats(filters),
+        const [centroids, geo] = await Promise.all([
           loadCountyCentroids(),
           loadStatesGeoJSON(),
+        ]);
+        if (cancelled) return;
+        const stateCentroids = buildStateCentroidMap(geo);
+
+        if (!filtersActive) {
+          const national = await loadNationalStates();
+          if (cancelled) return;
+          const stateMarkers = buildNationalStateMarkers(
+            national.states,
+            stateCentroids,
+          );
+          setData({
+            stats: {
+              cases: national.total_cases,
+              unsolved: national.total_unsolved,
+              clusters: national.total_clusters,
+            },
+            clusters: [],
+            stateMarkers,
+            reporting: { state: null, rate: null },
+            isCapped: false,
+          });
+          return;
+        }
+
+        const [stats, reportingRate, caseRows] = await Promise.all([
+          fetchStats(filters),
           fetchReportingRate(state),
+          fetchFilteredCases(filters),
         ]);
         if (cancelled) return;
 
-        const stateCentroids = buildStateCentroidMap(geo);
+        const clusters = computeClusters(
+          caseRows.rows,
+          minClusterSize,
+          centroids,
+          stateCentroids,
+        );
 
-        let clusters: ReturnType<typeof computeClusters> = [];
-        let capped = false;
-        if (state) {
-          const { rows, capped: wasCapped } = await fetchFilteredCases(filters);
-          if (cancelled) return;
-          clusters = computeClusters(
-            rows,
-            minClusterSize,
-            centroids,
-            stateCentroids,
-          );
-          capped = wasCapped;
-        }
+        const qualifyingClusterCount = clusters.reduce(
+          (acc, c) => (c.tone === "red" ? acc + 1 : acc),
+          0,
+        );
 
         setData({
           stats: {
             cases: stats.cases,
             unsolved: stats.unsolved,
-            clusters: clusters.length,
+            clusters: qualifyingClusterCount,
           },
           clusters,
+          stateMarkers: [],
           reporting: { state, rate: reportingRate },
-          isCapped: capped,
+          isCapped: caseRows.capped,
         });
       } catch (err) {
         const message =

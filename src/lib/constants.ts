@@ -81,6 +81,16 @@ export const MIN_CLUSTER_SIZE = {
 // WA sit at 50–57% unsolved for 1980–2000 strangulation cases).
 export const CLUSTER_UNSOLVED_THRESHOLD = 0.5;
 
+// State-bubble markers on the default (no-filters) national view.
+// Diameter range + area-proportional sqrt scaling. The 0.50 threshold flips
+// the bubble red -> amber; it matches CLUSTER_UNSOLVED_THRESHOLD conceptually
+// (same "mostly unsolved" cutoff, just read at state granularity).
+export const STATE_MARKER = {
+  minPx: 30,
+  maxPx: 80,
+  redSolveRateThreshold: 0.5,
+} as const;
+
 export const REPORTING_GREEN_THRESHOLD = 70;
 
 export const STATE_NAMES = [
@@ -139,6 +149,7 @@ export const STATE_NAMES = [
 
 export const CENTROID_DATA_PATH = "/data/county-centroids.json";
 export const STATES_GEOJSON_PATH = "/data/us-states.geojson";
+export const NATIONAL_CLUSTERS_PATH = "/data/national-clusters.json";
 
 export const ROUTES = {
   landing: "/",
