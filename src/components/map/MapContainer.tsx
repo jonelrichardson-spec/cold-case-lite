@@ -34,6 +34,21 @@ const STATE_MARKER_COLORS = {
   },
 } as const;
 
+const COUNTY_MARKER_COLORS = {
+  red: {
+    fill: "rgba(200, 16, 46, 0.18)",
+    ring: "rgba(200, 16, 46, 0.65)",
+    text: "#FF4D6A",
+    glow: "0 0 24px rgba(200, 16, 46, 0.28)",
+  },
+  amber: {
+    fill: "rgba(232, 160, 32, 0.16)",
+    ring: "rgba(232, 160, 32, 0.55)",
+    text: "#F2B84A",
+    glow: "0 0 22px rgba(232, 160, 32, 0.20)",
+  },
+} as const;
+
 const STATE_SOURCE_ID = "us-states";
 const STATE_FILL_LAYER = "us-states-fill";
 const STATE_OUTLINE_LAYER = "us-states-outline";
@@ -289,23 +304,24 @@ function createClusterMarker(
   cluster: Cluster,
   onClick: (cluster: Cluster) => void,
 ): HTMLElement {
+  const palette = COUNTY_MARKER_COLORS[cluster.tone];
   const outer = clampSize(30 + (cluster.total - 5) * 0.15, 30, 68);
-  const inner = Math.round(outer * 0.55);
+  const toneLabel = cluster.tone === "red" ? "cluster" : "county";
 
   const wrapper = document.createElement("button");
   wrapper.type = "button";
   wrapper.setAttribute(
     "aria-label",
-    `${cluster.countyFips}: ${cluster.total} cases, ${cluster.unsolved} unsolved. Open detail panel.`,
+    `${cluster.countyFips}: ${cluster.total} cases, ${cluster.unsolved} unsolved (${toneLabel}). Open detail panel.`,
   );
   wrapper.title = `${cluster.countyFips} — ${cluster.total} cases · ${cluster.unsolved} unsolved`;
   wrapper.style.width = `${outer}px`;
   wrapper.style.height = `${outer}px`;
   wrapper.style.padding = "0";
   wrapper.style.borderRadius = "50%";
-  wrapper.style.background = "rgba(200, 16, 46, 0.12)";
-  wrapper.style.border = "1px solid rgba(200, 16, 46, 0.35)";
-  wrapper.style.boxShadow = "0 0 28px rgba(200, 16, 46, 0.15)";
+  wrapper.style.background = palette.fill;
+  wrapper.style.border = `1px solid ${palette.ring}`;
+  wrapper.style.boxShadow = palette.glow;
   wrapper.style.display = "flex";
   wrapper.style.alignItems = "center";
   wrapper.style.justifyContent = "center";
@@ -315,14 +331,15 @@ function createClusterMarker(
     onClick(cluster);
   });
 
-  const core = document.createElement("div");
-  core.style.width = `${inner}px`;
-  core.style.height = `${inner}px`;
-  core.style.borderRadius = "50%";
-  core.style.background = "rgba(200, 16, 46, 0.65)";
-  core.style.border = "1px solid #C8102E";
-  core.style.pointerEvents = "none";
-  wrapper.appendChild(core);
+  const label = document.createElement("span");
+  label.textContent = COMPACT_INT.format(cluster.total);
+  label.style.color = palette.text;
+  label.style.fontFamily = "var(--font-mono), monospace";
+  label.style.fontSize = `${Math.max(10, Math.round(outer * 0.28))}px`;
+  label.style.fontWeight = "600";
+  label.style.letterSpacing = "0.5px";
+  label.style.pointerEvents = "none";
+  wrapper.appendChild(label);
 
   return wrapper;
 }

@@ -82,11 +82,16 @@ export function MapDataLoader() {
           stateCentroids,
         );
 
+        const qualifyingClusterCount = clusters.reduce(
+          (acc, c) => (c.tone === "red" ? acc + 1 : acc),
+          0,
+        );
+
         setData({
           stats: {
             cases: stats.cases,
             unsolved: stats.unsolved,
-            clusters: clusters.length,
+            clusters: qualifyingClusterCount,
           },
           clusters,
           stateMarkers: [],

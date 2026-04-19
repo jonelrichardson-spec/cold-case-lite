@@ -36,13 +36,14 @@ export function computeClusters(
 
   const out: Cluster[] = [];
   for (const [countyFips, agg] of groups) {
-    if (agg.total < minClusterSize) continue;
-    const unsolvedRatio = agg.unsolved / agg.total;
-    if (unsolvedRatio < CLUSTER_UNSOLVED_THRESHOLD) continue;
-    const solveRate = 1 - unsolvedRatio;
     const countyCenter = countyCentroids[countyFips];
     const center = countyCenter ?? stateCentroids[agg.state];
     if (!center) continue;
+    const unsolvedRatio = agg.total > 0 ? agg.unsolved / agg.total : 0;
+    const solveRate = 1 - unsolvedRatio;
+    const meetsThreshold =
+      agg.total >= minClusterSize &&
+      unsolvedRatio >= CLUSTER_UNSOLVED_THRESHOLD;
     out.push({
       countyFips,
       state: agg.state,
@@ -51,6 +52,7 @@ export function computeClusters(
       solveRate,
       center,
       isFallback: !countyCenter,
+      tone: meetsThreshold ? "red" : "amber",
     });
   }
   return out;
