@@ -225,6 +225,7 @@ export default function MapContainer() {
   }, [stateMarkers]);
 
   const hasDetailOpen = useMapStore((s) => s.selectedCluster !== null);
+  const detailExpanded = useMapStore((s) => s.detailExpanded);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -232,7 +233,7 @@ export default function MapContainer() {
       if (mapRef.current) mapRef.current.resize();
     });
     return () => cancelAnimationFrame(raf);
-  }, [hasDetailOpen]);
+  }, [hasDetailOpen, detailExpanded]);
 
   const resetSignal = useMapStore((s) => s.resetSignal);
   const isFirstResetRef = useRef(true);
